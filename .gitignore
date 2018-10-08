@@ -2,4 +2,5 @@
 16BitCPU.hw/
 16BitCPU.ip_user_files/
 16BitCPU.sim/
+16BitCPU.runs/
 *.xpr

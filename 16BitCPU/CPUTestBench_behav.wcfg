@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="2000000001fs"></ZoomEndTime>
-      <Cursor1Time time="2000000000fs"></Cursor1Time>
+      <ZoomEndTime time="2000000000fs"></ZoomEndTime>
+      <Cursor1Time time="454545000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="88"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="125"></NameColumnWidth>
+      <ValueColumnWidth column_width="103"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="6" />
+   <WVObjectSize size="18" />
    <wvobject fp_name="/CPUTestBench/CLK" type="logic">
       <obj_property name="ElementShortName">CLK</obj_property>
       <obj_property name="ObjectShortName">CLK</obj_property>
@@ -44,5 +44,58 @@
    <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/fetch_new" type="logic">
       <obj_property name="ElementShortName">fetch_new</obj_property>
       <obj_property name="ObjectShortName">fetch_new</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/ram/address_reg_i" type="array">
+      <obj_property name="ElementShortName">address_reg_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">address_reg_i[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/r2/q_i" type="array">
+      <obj_property name="ElementShortName">q_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_i[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/r3/q_i" type="array">
+      <obj_property name="ElementShortName">q_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_i[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/ram_wr" type="logic">
+      <obj_property name="ElementShortName">ram_wr</obj_property>
+      <obj_property name="ObjectShortName">ram_wr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/ram_in" type="logic">
+      <obj_property name="ElementShortName">ram_in</obj_property>
+      <obj_property name="ObjectShortName">ram_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/r2_out" type="logic">
+      <obj_property name="ElementShortName">r2_out</obj_property>
+      <obj_property name="ObjectShortName">r2_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/r3_out" type="logic">
+      <obj_property name="ElementShortName">r3_out</obj_property>
+      <obj_property name="ObjectShortName">r3_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/op_step" type="array">
+      <obj_property name="ElementShortName">op_step[1:0]</obj_property>
+      <obj_property name="ObjectShortName">op_step[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/OPCODE" type="array">
+      <obj_property name="ElementShortName">OPCODE[7:0]</obj_property>
+      <obj_property name="ObjectShortName">OPCODE[7:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/cpu_logic/out_in" type="logic">
+      <obj_property name="ElementShortName">out_in</obj_property>
+      <obj_property name="ObjectShortName">out_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/out/q_i" type="array">
+      <obj_property name="ElementShortName">q_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_i[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/CPUTestBench/DUT/r0/q_i" type="array">
+      <obj_property name="ElementShortName">q_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_i[15:0]</obj_property>
    </wvobject>
 </wave_config>

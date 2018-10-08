@@ -52,7 +52,7 @@ wire fetch_new;
 wire [7:0] OPCODE;
 assign OPCODE = FULL_OPCODE[9:2];
 
-//---------------- INSTRUCTION FETCHING -----------------------------------------------------------------
+//---------------- INSTRUCTION FETCHING ----------------------------------------------
 
 always @(posedge CLK, negedge ARST_L)
     begin
@@ -94,13 +94,13 @@ always @(OPCODE, op_step, fetch_step)
         else begin
             casez ({OPCODE, op_step})
                 // ---------LDR----------------------
-                11'b0000_????_00: next_op_step <= 2'b01; // IR out, RAM in (Access location in RAMs)
-                11'b0000_????_01: next_op_step <= 2'b11; // RAM out, register in (put value into r0)
+                11'b0000_????_00: next_op_step <= 2'b01; // REG out, RAM in (Access location in RAMs)
+                11'b0000_????_01: next_op_step <= 2'b11; // RAM out, REG in
                 // ----------------------------------
                 
                 // ---------STR----------------------
-                11'b0001_????_00: next_op_step <= 2'b01; // IR out, RAM in
-                11'b0001_????_01: next_op_step <= 2'b11; // RAM wr, register out
+                11'b0001_????_00: next_op_step <= 2'b01; // REG (address) out, RAM in
+                11'b0001_????_01: next_op_step <= 2'b11; // RAM wr, REG (contents) out
                 // -----------------------------------
                 
                 // ---------MOV----------------------
@@ -151,18 +151,18 @@ assign ram_out = (fetch_step == 2'b01 || (OPCODE[7:4] == 4'h0 && op_step == 2'b0
 assign ir_in = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 assign pc_count = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 
-assign ir_out = ((OPCODE[7:4] == 4'h0 || OPCODE[7:4] == 4'h1 || OPCODE[7:4] == 4'h2 || OPCODE == 8'hE0) && op_step == 2'b00) ? 1'b1 : 1'b0;
-assign r0_in = (OPCODE == 8'h00 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b00 && op_step == 2'b00) ? 1'b1 : 1'b0;
-assign r1_in = (OPCODE == 8'h01 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b01 && op_step == 2'b00) ? 1'b1 : 1'b0;
-assign r2_in = (OPCODE == 8'h02 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b10 && op_step == 2'b00) ? 1'b1 : 1'b0;
-assign r3_in = (OPCODE == 8'h03 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b11 && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign ir_out = ((OPCODE[7:4] == 4'h2 || OPCODE == 8'hE0) && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign r0_in = (OPCODE[7:2] == 6'b0000_00 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b00 && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign r1_in = (OPCODE[7:2] == 6'b0000_01 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b01 && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign r2_in = (OPCODE[7:2] == 6'b0000_10 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b10 && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign r3_in = (OPCODE[7:2] == 6'b0000_11 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b11 && op_step == 2'b00) ? 1'b1 : 1'b0;
 
 assign ram_wr = (OPCODE[7:4] == 4'h1 && op_step == 2'b01) ? 1'b1 : 1'b0;
 
-assign r0_out = ((OPCODE == 8'h10 && op_step == 2'b01) || (OPCODE == 8'hF0 && op_step == 2'b00)) ? 1'b1 : 1'b0;
-assign r1_out = ((OPCODE == 8'h11 && op_step == 2'b01) || (OPCODE == 8'hF1 && op_step == 2'b00)) ? 1'b1 : 1'b0;
-assign r2_out = ((OPCODE == 8'h12 && op_step == 2'b01) || (OPCODE == 8'hF2 && op_step == 2'b00)) ? 1'b1 : 1'b0;
-assign r3_out = ((OPCODE == 8'h13 && op_step == 2'b01) || (OPCODE == 8'hF3 && op_step == 2'b00)) ? 1'b1 : 1'b0;
+assign r0_out = ((OPCODE[7:4] == 4'h0 && OPCODE[1:0] == 2'b00 && op_step == 2'b00) || (OPCODE[7:4] == 4'h1 && OPCODE[1:0] == 2'b00 && op_step == 2'b00) || (OPCODE[7:2] == 6'b0001_00 && op_step == 2'b01) || (OPCODE == 8'hF0 && op_step == 2'b00)) ? 1'b1 : 1'b0;
+assign r1_out = ((OPCODE[7:4] == 4'h0 && OPCODE[1:0] == 2'b01 && op_step == 2'b00) || (OPCODE[7:4] == 4'h1 && OPCODE[1:0] == 2'b01 && op_step == 2'b00) || (OPCODE[7:2] == 6'b0001_01 && op_step == 2'b01) || (OPCODE == 8'hF1 && op_step == 2'b00)) ? 1'b1 : 1'b0;
+assign r2_out = ((OPCODE[7:4] == 4'h0 && OPCODE[1:0] == 2'b10 && op_step == 2'b00) || (OPCODE[7:4] == 4'h1 && OPCODE[1:0] == 2'b10 && op_step == 2'b00) || (OPCODE[7:2] == 6'b0001_10 && op_step == 2'b01) || (OPCODE == 8'hF2 && op_step == 2'b00)) ? 1'b1 : 1'b0;
+assign r3_out = ((OPCODE[7:4] == 4'h0 && OPCODE[1:0] == 2'b11 && op_step == 2'b00) || (OPCODE[7:4] == 4'h1 && OPCODE[1:0] == 2'b11 && op_step == 2'b00) || (OPCODE[7:2] == 6'b0001_11 && op_step == 2'b01) || (OPCODE == 8'hF3 && op_step == 2'b00)) ? 1'b1 : 1'b0;
 
 assign r0_mov = (OPCODE == 8'h20 && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign r1_mov = (OPCODE == 8'h21 && op_step == 2'b00) ? 1'b1 : 1'b0;
