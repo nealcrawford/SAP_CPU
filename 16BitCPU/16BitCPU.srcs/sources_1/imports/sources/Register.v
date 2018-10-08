@@ -1,12 +1,9 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Engineer: 
+// Author: Neal Crawford
 // Create Date: 08/19/2018 01:01:24 PM
 // Module Name: Register
-// Project Name: 
-// Description: 
-// Revision:
-// Additional Comments:
+// Description: Model for general purpose registers, 'output' register, and instruction register
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -16,7 +13,7 @@ module Register(CLK, ACLR_L, IN, OUT, IN_EN, MOV_EN);
 input CLK, ACLR_L, IN_EN, MOV_EN;
 input [15:0] IN;
 output [15:0] OUT;
-reg [15:0] q_i; // Constant output of register value to modules such as ALU
+reg [15:0] q_i;
 
 assign OUT = q_i;
 

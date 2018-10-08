@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Engineer: Neal Crawford
+// Author: Neal Crawford
 // Create Date: 08/19/2018 12:58:55 PM
 // Module Name: Top
-// Description: 
-// Revision:
-// Additional Comments:
+// Description: Top level module of the 16 bit processor
+//
+//              Output handled by a register constantly pushing contents to SYS_OUT
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +19,7 @@ wire [15:0] bus;
 
 // CPU CONTROL SIGNALS ------------------------
 //RAM
-wire ram_in, ram_out, ram_wr; // (ram_wr - which means enable ability to program ram)
+wire ram_in, ram_out, ram_wr; // RAM enable signals to input an address, output contents at given address, or write to given address
 
 // Program Counter
 wire branch, pc_out, pc_count;

@@ -1,11 +1,10 @@
 `timescale 1ns / 1ps
 ////////////////////////////////////////////////////////////////////////////////// 
-// Engineer: Neal Crawford
+// Author: Neal Crawford
 // Create Date: 08/19/2018 01:01:06 PM
 // Module Name: ALU
-// Description: 
-// Revision:
-// Additional Comments:
+// Description: Current support for
+//              add, subtract, multiply, logical left and right shifts, arithmetic right shifts
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -30,13 +29,19 @@ always @(*)
         case (SELECT)
             7'b000_0000: OUT = R0_INPUT + R0_INPUT;
             7'b000_0001: OUT = R0_INPUT + R1_INPUT;
+            7'b000_0100: OUT = R0_INPUT + R1_INPUT; // Code in both combinations of addition here to avoid handling in compiler
             7'b000_0010: OUT = R0_INPUT + R2_INPUT;
+            7'b000_1000: OUT = R0_INPUT + R2_INPUT;
             7'b000_0011: OUT = R0_INPUT + R3_INPUT;
+            7'b000_1100: OUT = R0_INPUT + R3_INPUT;
             7'b000_0101: OUT = R1_INPUT + R1_INPUT;
             7'b000_0110: OUT = R1_INPUT + R2_INPUT;
+            7'b000_1001: OUT = R1_INPUT + R2_INPUT;
             7'b000_0111: OUT = R1_INPUT + R3_INPUT;
+            7'b000_1101: OUT = R1_INPUT + R3_INPUT;
             7'b000_1010: OUT = R2_INPUT + R2_INPUT;
             7'b000_1011: OUT = R2_INPUT + R3_INPUT;
+            7'b000_1110: OUT = R2_INPUT + R3_INPUT;
             7'b000_1111: OUT = R3_INPUT + R3_INPUT;
             
             7'b001_0000: OUT = R0_INPUT - R0_INPUT;

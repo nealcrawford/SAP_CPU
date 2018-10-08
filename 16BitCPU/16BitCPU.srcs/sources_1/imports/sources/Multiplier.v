@@ -1,11 +1,10 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Engineer: Neal Crawford
-// 
+// Author: Neal Crawford
 // Create Date: 07/16/2018 03:26:47 PM
 // Module Name: Multiplier
-// Project Name: 
-// Description: Multiplies two terms using the shift and add method
+// Description: Multiplies two 8-bit terms using shift and add method
+//              yields 16-bit result. An operand over 255 will not yield a valid result!
 // 
 //////////////////////////////////////////////////////////////////////////////////
 

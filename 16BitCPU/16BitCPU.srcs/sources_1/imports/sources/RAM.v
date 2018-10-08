@@ -1,10 +1,8 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
+// Author: Neal Crawford
 // Create Date: 08/20/2018 04:28:35 PM
 // Module Name: RAM
-//
-// Revision:
-// Revision 0.01 - File Created
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -21,7 +19,7 @@ reg [7:0] address_reg_i;
 reg [15:0] memory[255:0];
 
 initial begin
-    $readmemh("Example_program.mem", memory, 0);
+    $readmemh("ex_2.mem", memory, 0);
 end
 
 always @(posedge CLK)

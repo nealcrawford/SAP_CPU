@@ -1,14 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Engineer: Neal Crawford
+// Author: Neal Crawford
 // Create Date: 08/20/2018 11:25:16 PM
 // Module Name: ProgramCounter
-// Description: 
-// Revision:
-// Additional Comments:
+// Description: Basic counter with ability to branch to given address
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
 
 module ProgramCounter(CLK, ACLR_L, BRANCH, PC_COUNT, BRANCH_ADDRESS, PC_VAL);
 
