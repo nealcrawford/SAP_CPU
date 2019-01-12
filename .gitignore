@@ -4,3 +4,6 @@
 16BitCPU.sim/
 16BitCPU.runs/
 *.xpr
+*.jou
+*.log
+*.str

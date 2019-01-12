@@ -4,9 +4,20 @@
 // Create Date: 08/19/2018 12:58:55 PM
 // Module Name: Top
 // Description: Top level module of the 16 bit processor
-//
 //              Output handled by a register constantly pushing contents to SYS_OUT
-// 
+//              
+//              Supported instructions:
+//              LDR - Load value from memory to register
+//              STR - Store value from register to memory
+//              MOV - Move immediate into register
+//              ADD - Add two registers
+//              SUB - Subtract two registers
+//              LSL - Logical shift left
+//              LSR - Logical shift right
+//              ASR - Arithmetic shift right
+//              MUL - Multiply two registers
+//              B   - Branch to new instrcution
+//              OUT - Output contents of register
 //////////////////////////////////////////////////////////////////////////////////
 
 module Top(CLK, ARST_L, HALT, SYS_OUT);
@@ -40,6 +51,7 @@ wire [7:0] pc_bus, ram_in_bus;
 
 // ---------------------------------------------
 
+// Data is passed between modules through this 16 bit bus
 assign bus = (r0_out == 1'b1) ? r0_bus : (r1_out == 1'b1) ? r1_bus : (r2_out == 1'b1) ? r2_bus : (r3_out == 1'b1) ? r3_bus : (ir_out == 1'b1) ? ir_bus
  : (alu_en == 1'b1) ? alu_bus : (ram_out == 1'b1) ? ram_bus : (pc_out == 1'b1) ? {8'h00, pc_bus} : 16'bzzzz;
 
@@ -85,7 +97,7 @@ Register instruction_reg(
     .IN(bus),
     .OUT(ir_bus),
     .IN_EN(ir_in),
-    .MOV_EN()
+    .MOV_EN() // No current application for moving immediate into instruction register
 );
 
 ALU alu(
@@ -151,6 +163,6 @@ Register out(
     .IN(bus),
     .OUT(SYS_OUT),
     .IN_EN(out_in),
-    .MOV_EN()
+    .MOV_EN() // No current application for moving immediate into output register
 );
 endmodule

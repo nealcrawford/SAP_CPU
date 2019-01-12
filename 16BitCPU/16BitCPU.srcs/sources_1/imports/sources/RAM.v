@@ -19,7 +19,7 @@ reg [7:0] address_reg_i;
 reg [15:0] memory[255:0];
 
 initial begin
-    $readmemh("ex_2.mem", memory, 0);
+    $readmemh("Example_program.mem", memory, 0);
 end
 
 always @(posedge CLK)

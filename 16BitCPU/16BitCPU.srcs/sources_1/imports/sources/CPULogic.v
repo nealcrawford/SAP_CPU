@@ -68,7 +68,7 @@ always @(fetch_step, fetch_new, HALT)
             4'b00_?_0: next_fetch_step <= 2'b01;   // PC out, ram in
             4'b01_?_0: next_fetch_step <= 2'b11;   // ram out, ir in, pc count
             4'b11_0_0: next_fetch_step <= 2'b11;   // HOLD, no fetch assertions
-            4'b11_1_0: next_fetch_step <= 2'b00;   // Begin fetching new instruction
+            4'b11_1_0: next_fetch_step <= 2'b00;   // Start new instruction fetch
             4'b??_?_1: next_fetch_step <= 2'b00;   // Processor HALT, only clock active
             default: next_fetch_step <= 2'b11;
         endcase
