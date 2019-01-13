@@ -25,13 +25,14 @@ module CPULogic(
                 r2_in, r2_mov,  r2_out,
                 r3_in, r3_mov,  r3_out,
                 out_in,
-                alu_en, alu_sel,
+                alu_en, alu_sel, condition_flags,
                 branch,
                 HALT
 );
 
 input CLK, ARST_L, HALT;
 input [9:0] FULL_OPCODE;
+input [3:0] condition_flags;
 
 output ram_in, ram_out, ram_wr;
 output pc_out, pc_count;
@@ -132,7 +133,7 @@ always @(OPCODE, op_step, fetch_step)
                 // ----------------------------------
                 
                 // --------- B ----------------------
-                11'b1110_0000_00: next_op_step <= 2'b11; // IR out, branch en
+                11'b1110_????_00: next_op_step <= 2'b11; // IR out, branch en
                 // ----------------------------------
                 
                 // ---------OUT---------------------
@@ -151,7 +152,7 @@ assign ram_out = (fetch_step == 2'b01 || (OPCODE[7:4] == 4'h0 && op_step == 2'b0
 assign ir_in = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 assign pc_count = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 
-assign ir_out = ((OPCODE[7:4] == 4'h2 || OPCODE == 8'hE0) && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign ir_out = (OPCODE[7:4] == 4'h2 && op_step == 2'b00) || branch == 1'b1 ? 1'b1 : 1'b0;
 assign r0_in = (OPCODE[7:2] == 6'b0000_00 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b00 && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign r1_in = (OPCODE[7:2] == 6'b0000_01 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b01 && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign r2_in = (OPCODE[7:2] == 6'b0000_10 && op_step == 2'b01) || ((OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) && FULL_OPCODE[1:0] == 2'b10 && op_step == 2'b00) ? 1'b1 : 1'b0;
@@ -173,7 +174,23 @@ assign alu_en = (OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9 && op_step == 2'b00)
 assign alu_sel[6:4] = (OPCODE[7:4] == 4'h4) ? 3'b000 : (OPCODE[7:4] == 4'h5) ? 3'b001 : (OPCODE[7:4] == 4'h6) ? 3'b010 : (OPCODE[7:4] == 4'h7) ? 3'b011 : (OPCODE[7:4] == 4'h8) ? 3'b100 : (OPCODE[7:4] == 4'h9) ? 3'b101 : 3'b000;
 assign alu_sel[3:0] = (OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) ? OPCODE[3:0] : 4'h0;
 
-assign branch = (OPCODE == 8'hE0 && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign branch = (OPCODE[7:4] == 4'hE && op_step == 2'b00) && 
+                                 ((OPCODE[3:0] == 4'h0) || // B
+    (OPCODE[3:0] == 4'h1 && condition_flags[2] == 1'b1) || // BEQ
+    (OPCODE[3:0] == 4'h2 && condition_flags[2] == 1'b0) || // BNE
+    (OPCODE[3:0] == 4'h3 && condition_flags[1] == 1'b1) || // BHS
+    (OPCODE[3:0] == 4'h4 && condition_flags[1] == 1'b0) || // BLO
+    (OPCODE[3:0] == 4'h5 && condition_flags[3] == 1'b1) || // BMI
+    (OPCODE[3:0] == 4'h6 && condition_flags[3] == 1'b0) || // BPL
+    (OPCODE[3:0] == 4'h7 && condition_flags[0] == 1'b1) || // BVS
+    (OPCODE[3:0] == 4'h8 && condition_flags[0] == 1'b0) || // BVC
+    (OPCODE[3:0] == 4'h9 && condition_flags[2:1] == 2'b01) || // BHI
+    (OPCODE[3:0] == 4'hA && (condition_flags[2] == 1'b1 || condition_flags[1] == 1'b1)) || // BLS
+    (OPCODE[3:0] == 4'hB && condition_flags[3] == condition_flags[0]) || // BGE
+    (OPCODE[3:0] == 4'hC && condition_flags[3] != condition_flags[0]) || // BLT
+    (OPCODE[3:0] == 4'hD && (condition_flags[3] == condition_flags[0] && condition_flags[2] == 1'b0)) || // BGT
+    (OPCODE[3:0] == 4'hE && (condition_flags[3] != condition_flags[0] && condition_flags[2] == 1'b1))) ? 1'b1 : 1'b0; // BLE
+    
 assign out_in = (OPCODE[7:4] == 4'hF && op_step == 2'b00) ? 1'b1 : 1'b0;
 
 assign fetch_new = (!(fetch_step == 2'b00 || fetch_step == 2'b01) && next_op_step == 2'b11);

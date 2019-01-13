@@ -8,9 +8,11 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module ALU(SELECT, R0_INPUT, R1_INPUT, R2_INPUT, R3_INPUT, OUT);
+module ALU(CLK, ARST_L, SELECT, EN, R0_INPUT, R1_INPUT, R2_INPUT, R3_INPUT, OUT, CONDITION_REG);
 
 input [6:0] SELECT;
+input CLK, ARST_L;
+input EN;
 input [15:0] R0_INPUT;
 input [15:0] R1_INPUT;
 input [15:0] R2_INPUT;
@@ -22,7 +24,103 @@ wire [15:0] mul_out;
 
 Multiplier multiplier(.IN_A(mul_in_a), .IN_B(mul_in_b), .OUT(mul_out));
 
-always @(*)
+// N: If MSB is set, N is set
+// Z: If result is zero, Z is set
+// C: If adding, and result is smaller than one of the operands, C is set
+// V: If product of signs of operands do not match sign of result, V is set
+output reg [3:0] CONDITION_REG; // N,Z,C,V
+
+always @(posedge CLK, negedge ARST_L)
+    begin
+        if (ARST_L == 1'b0) begin
+            CONDITION_REG <= 4'h0;
+        end else if (EN == 1'b1) begin
+            if (OUT[15] == 1'b1) // N: Set to MSB, (value of OUT[15], but cannot set directly equal to OUT[15]
+                CONDITION_REG[3] <= 1'b1;
+            else
+                CONDITION_REG[3] <= 1'b0;
+            if (OUT == 16'h0000) // Z: Zero check
+                CONDITION_REG[2] <= 1'b1;
+            else
+                CONDITION_REG[2] <= 1'b0;
+            if (SELECT[6:4] == 3'b000 || SELECT[6:4] == 3'b010 || SELECT[6:4] == 3'b101) begin // C: Unsigned overflow check
+                if ((SELECT[3:0] == 4'b0000) && OUT < R0_INPUT)
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0001) && (OUT < R0_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0010) && (OUT < R0_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0011) && (OUT < R0_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0100) && (OUT < R1_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0101) && (OUT < R1_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0110) && (OUT < R1_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0111) && (OUT < R1_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1000) && (OUT < R2_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1001) && (OUT < R2_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1010) && (OUT < R2_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1011) && (OUT < R2_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1100) && (OUT < R3_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1101) && (OUT < R3_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1110) && (OUT < R3_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1111) && (OUT < R3_INPUT))
+                    CONDITION_REG[1] <= 1'b1;
+                else
+                    CONDITION_REG[1] <= 1'b0;
+            end else
+                CONDITION_REG[1] <= 1'b0;
+            if (SELECT[6:4] == 3'b000 || SELECT[6:4] == 3'b010 || SELECT[6:4] == 3'b101) begin // V: Signed overflow check
+                if ((SELECT[3:0] == 4'b0000) && (R0_INPUT[15] ^ R0_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0001) && (R0_INPUT[15] ^ R1_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0010) && (R0_INPUT[15] ^ R2_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0011) && (R0_INPUT[15] ^ R3_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0100) && (R1_INPUT[15] ^ R0_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0101) && (R1_INPUT[15] ^ R1_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0110) && (R1_INPUT[15] ^ R2_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b0111) && (R1_INPUT[15] ^ R3_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1000) && (R2_INPUT[15] ^ R0_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1001) && (R2_INPUT[15] ^ R1_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1010) && (R2_INPUT[15] ^ R2_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1011) && (R2_INPUT[15] ^ R3_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1100) && (R3_INPUT[15] ^ R0_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1101) && (R3_INPUT[15] ^ R1_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1110) && (R3_INPUT[15] ^ R2_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else if ((SELECT[3:0] == 4'b1111) && (R3_INPUT[15] ^ R3_INPUT[15] != OUT[15]))
+                    CONDITION_REG[0] <= 1'b1;
+                else
+                    CONDITION_REG[0] <= 1'b0;
+            end else
+                CONDITION_REG[0] <= 1'b0;
+        end
+    end
+
+always @(*) // Combinational
     begin
         mul_in_a = 8'hzz;
         mul_in_b = 8'hzz;
@@ -60,7 +158,7 @@ always @(*)
             7'b001_1011: OUT = R2_INPUT - R3_INPUT;
             7'b001_1110: OUT = R3_INPUT - R2_INPUT;
             7'b001_1111: OUT = R3_INPUT - R3_INPUT;
-
+        
             7'b010_0000: OUT = R0_INPUT << R0_INPUT;
             7'b010_0001: OUT = R0_INPUT << R1_INPUT;
             7'b010_0100: OUT = R1_INPUT << R0_INPUT;
@@ -197,5 +295,4 @@ always @(*)
             
         endcase
     end
-    
 endmodule

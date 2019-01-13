@@ -45,6 +45,9 @@ wire out_in;
 // ALU
 wire alu_en;
 wire [6:0] alu_sel;
+wire [3:0] condition_bus;
+
+
 
 wire [15:0] r0_bus, r1_bus, r2_bus, r3_bus, ir_bus, ram_bus, alu_bus;
 wire [7:0] pc_bus, ram_in_bus;
@@ -101,12 +104,16 @@ Register instruction_reg(
 );
 
 ALU alu(
+    .CLK(CLK),
+    .ARST_L(ARST_L),
     .SELECT(alu_sel),
+    .EN(alu_en),
     .R0_INPUT(r0_bus),
     .R1_INPUT(r1_bus),
     .R2_INPUT(r2_bus),
     .R3_INPUT(r3_bus),
-    .OUT(alu_bus)
+    .OUT(alu_bus),
+    .CONDITION_REG(condition_bus)
 );
 
 RAM ram(
@@ -153,6 +160,7 @@ CPULogic cpu_logic(
     .out_in(out_in),
     .alu_en(alu_en),
     .alu_sel(alu_sel),
+    .condition_flags(condition_bus),
     .branch(branch),
     .HALT(HALT)
 );
