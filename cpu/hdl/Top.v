@@ -20,9 +20,9 @@
 //              OUT - Output contents of register
 //////////////////////////////////////////////////////////////////////////////////
 
-module Top(CLK, ARST_L, HALT, SYS_OUT);
+module Top(CLK, SLOW_CLOCK_STRB, ARST_L, HALT, SYS_OUT);
 
-input CLK, ARST_L, HALT;
+input CLK, SLOW_CLOCK_STRB, ARST_L, HALT;
 
 output [15:0] SYS_OUT;
 
@@ -56,10 +56,11 @@ wire [7:0] pc_bus, ram_in_bus;
 
 // Data is passed between modules through this 16 bit bus
 assign bus = (r0_out == 1'b1) ? r0_bus : (r1_out == 1'b1) ? r1_bus : (r2_out == 1'b1) ? r2_bus : (r3_out == 1'b1) ? r3_bus : (ir_out == 1'b1) ? ir_bus
- : (alu_en == 1'b1) ? alu_bus : (ram_out == 1'b1) ? ram_bus : (pc_out == 1'b1) ? {8'h00, pc_bus} : 16'bzzzz;
+ : (alu_en == 1'b1) ? alu_bus : (ram_out == 1'b1) ? ram_bus : (pc_out == 1'b1) ? {8'h00, pc_bus} : 16'h0000;
 
 Register r0(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(r0_bus),
@@ -69,6 +70,7 @@ Register r0(
 
 Register r1(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(r1_bus),
@@ -78,6 +80,7 @@ Register r1(
 
 Register r2(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(r2_bus),
@@ -87,6 +90,7 @@ Register r2(
 
 Register r3(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(r3_bus),
@@ -96,6 +100,7 @@ Register r3(
 
 Register instruction_reg(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(ir_bus),
@@ -105,6 +110,7 @@ Register instruction_reg(
 
 ALU alu(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ARST_L(ARST_L),
     .SELECT(alu_sel),
     .EN(alu_en),
@@ -118,6 +124,7 @@ ALU alu(
 
 RAM ram(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .RAM_IN(ram_in),
     .WRITE_EN(ram_wr),
     .DATA_IN(bus),
@@ -127,6 +134,7 @@ RAM ram(
 
 ProgramCounter pc(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .BRANCH(branch),
     .PC_COUNT(pc_count),
@@ -136,6 +144,7 @@ ProgramCounter pc(
 
 CPULogic cpu_logic(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ARST_L(ARST_L),
     .FULL_OPCODE(ir_bus[15:6]), 
     .ram_in(ram_in), 
@@ -167,6 +176,7 @@ CPULogic cpu_logic(
 
 Register out(
     .CLK(CLK),
+    .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ACLR_L(ARST_L),
     .IN(bus),
     .OUT(SYS_OUT),

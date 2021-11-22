@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module CPULogic(
-                CLK, ARST_L, FULL_OPCODE, 
+                CLK, SLOW_CLOCK_STRB, ARST_L, FULL_OPCODE, 
                 ram_in, ram_out, ram_wr, 
                 pc_out, pc_count, 
                 ir_in, ir_out, 
@@ -30,7 +30,7 @@ module CPULogic(
                 HALT
 );
 
-input CLK, ARST_L, HALT;
+input CLK, SLOW_CLOCK_STRB, ARST_L, HALT;
 input [9:0] FULL_OPCODE;
 input [3:0] condition_flags;
 
@@ -50,8 +50,24 @@ reg [1:0] fetch_step;
 reg [1:0] next_fetch_step;
 wire fetch_new;
 
+reg halt_1, halt_2, halt_synced;
+
 wire [7:0] OPCODE;
 assign OPCODE = FULL_OPCODE[9:2];
+
+always @(posedge CLK, negedge ARST_L)
+begin
+    if (ARST_L == 0)
+    begin
+        halt_1 <= 0;
+        halt_2 <= 0;
+        halt_synced <= 0;
+    end
+    else if (SLOW_CLOCK_STRB == 1)
+        halt_1 <= HALT;
+        halt_2 <= halt_1;
+        halt_synced <= halt_2;
+end
 
 //---------------- INSTRUCTION FETCHING ----------------------------------------------
 
@@ -59,19 +75,19 @@ always @(posedge CLK, negedge ARST_L)
     begin
         if (ARST_L == 1'b0)
             fetch_step <= 2'b00;
-        else 
+        else if (SLOW_CLOCK_STRB == 1)
             fetch_step <= next_fetch_step;
     end
 
-always @(fetch_step, fetch_new, HALT)
+always @(fetch_step, fetch_new, halt_synced)
     begin
-        casez ({fetch_step, fetch_new, HALT})
-            4'b00_?_0: next_fetch_step <= 2'b01;   // PC out, ram in
-            4'b01_?_0: next_fetch_step <= 2'b11;   // ram out, ir in, pc count
-            4'b11_0_0: next_fetch_step <= 2'b11;   // HOLD, no fetch assertions
-            4'b11_1_0: next_fetch_step <= 2'b00;   // Start new instruction fetch
-            4'b??_?_1: next_fetch_step <= 2'b00;   // Processor HALT, only clock active
-            default: next_fetch_step <= 2'b11;
+        casez ({fetch_step, fetch_new, halt_synced})
+            4'b00_?_0: next_fetch_step = 2'b01;   // PC out, ram in
+            4'b01_?_0: next_fetch_step = 2'b11;   // ram out, ir in, pc count
+            4'b11_0_0: next_fetch_step = 2'b11;   // HOLD, no fetch assertions
+            4'b11_1_0: next_fetch_step = 2'b00;   // Start new instruction fetch
+            4'b??_?_1: next_fetch_step = 2'b00;   // Processor HALT, only clock active
+            default: next_fetch_step = 2'b11;
         endcase
     end
 
@@ -84,7 +100,7 @@ always @(posedge CLK, negedge ARST_L)
     begin
         if (ARST_L == 1'b0)
             op_step <= 2'b11; // No instruction loaded upon reset, so begin in dormant state
-        else
+        else if (SLOW_CLOCK_STRB == 1)
             op_step <= next_op_step;
     end
 
@@ -146,8 +162,8 @@ always @(OPCODE, op_step, fetch_step)
         end
     end
 
-assign pc_out = (fetch_step == 2'b00 && HALT == 1'b0) ? 1'b1 : 1'b0;
-assign ram_in = (fetch_step == 2'b00 && HALT == 1'b0) || ((OPCODE[7:4] == 4'h0 || OPCODE[7:4] == 4'h1) && op_step == 2'b00) ? 1'b1 : 1'b0;
+assign pc_out = (fetch_step == 2'b00 && halt_synced == 1'b0) ? 1'b1 : 1'b0;
+assign ram_in = (fetch_step == 2'b00 && halt_synced == 1'b0) || ((OPCODE[7:4] == 4'h0 || OPCODE[7:4] == 4'h1) && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign ram_out = (fetch_step == 2'b01 || (OPCODE[7:4] == 4'h0 && op_step == 2'b01)) ? 1'b1 : 1'b0;
 assign ir_in = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 assign pc_count = (fetch_step == 2'b01) ? 1'b1 : 1'b0;

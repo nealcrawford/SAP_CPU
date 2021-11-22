@@ -1,4 +1,8 @@
-# A 16 Bit softcore processor designed with Verilog
+# A Malvino - SAP style soft processor
+
+Build instructions:
+If you don't have it, install [Cygwin](https://www.cygwin.com/) with make selected in installation options. Running make in the cpu directory of this repository will generate the IP.
+
 
 ### LOADING and STORING TO/FROM MEMORY
 ```
