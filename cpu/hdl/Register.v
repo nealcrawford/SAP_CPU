@@ -12,7 +12,7 @@ module Register(CLK, SLOW_CLOCK_STRB, ACLR_L, IN, OUT, IN_EN, MOV_EN);
 
 input CLK, SLOW_CLOCK_STRB, ACLR_L, IN_EN, MOV_EN;
 input [15:0] IN;
-output reg [15:0] OUT;
+output [15:0] OUT;
 reg [15:0] q_i;
 
 always @(posedge CLK, negedge ACLR_L)
@@ -29,12 +29,6 @@ always @(posedge CLK, negedge ACLR_L)
         end
     end
 
-always @(posedge CLK or negedge ACLR_L) begin : proc_OUT
-    if(~ACLR_L) begin
-        OUT <= 0;
-    end else begin
-        OUT <= q_i;
-    end
-end
+assign OUT = q_i;
 
 endmodule

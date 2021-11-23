@@ -30,7 +30,7 @@ wire [15:0] bus;
 
 // CPU CONTROL SIGNALS ------------------------
 //RAM
-wire ram_in, ram_out, ram_wr; // RAM enable signals to input an address, output contents at given address, or write to given address
+wire ram_out, ram_wr; // RAM enable signals to input an address, output contents at given address, or write to given address
 
 // Program Counter
 wire branch, pc_out, pc_count;
@@ -125,7 +125,6 @@ ALU alu(
 RAM ram(
     .CLK(CLK),
     .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
-    .RAM_IN(ram_in),
     .WRITE_EN(ram_wr),
     .DATA_IN(bus),
     .ADDRESS(bus[7:0]),
@@ -147,7 +146,6 @@ CPULogic cpu_logic(
     .SLOW_CLOCK_STRB(SLOW_CLOCK_STRB),
     .ARST_L(ARST_L),
     .FULL_OPCODE(ir_bus[15:6]), 
-    .ram_in(ram_in), 
     .ram_out(ram_out),
     .ram_wr(ram_wr),
     .pc_out(pc_out),

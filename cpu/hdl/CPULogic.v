@@ -17,7 +17,7 @@
 
 module CPULogic(
                 CLK, SLOW_CLOCK_STRB, ARST_L, FULL_OPCODE, 
-                ram_in, ram_out, ram_wr, 
+                ram_out, ram_wr, 
                 pc_out, pc_count, 
                 ir_in, ir_out, 
                 r0_in, r0_mov, r0_out, 
@@ -34,7 +34,7 @@ input CLK, SLOW_CLOCK_STRB, ARST_L, HALT;
 input [9:0] FULL_OPCODE;
 input [3:0] condition_flags;
 
-output ram_in, ram_out, ram_wr;
+output ram_out, ram_wr;
 output pc_out, pc_count;
 output ir_in, ir_out;
 output r0_in, r0_mov, r0_out;
@@ -144,7 +144,7 @@ always @(OPCODE, op_step, fetch_step)
                 11'b1000_????_00: next_op_step <= 2'b11; // ALU en, ALU sel, register in
                 // ----------------------------------
                 
-                // ---------ASR----------------------
+                // ---------MUL----------------------
                 11'b1001_????_00: next_op_step <= 2'b11; // ALU en, ALU sel, register in
                 // ----------------------------------
                 
@@ -163,7 +163,6 @@ always @(OPCODE, op_step, fetch_step)
     end
 
 assign pc_out = (fetch_step == 2'b00 && halt_synced == 1'b0) ? 1'b1 : 1'b0;
-assign ram_in = (fetch_step == 2'b00 && halt_synced == 1'b0) || ((OPCODE[7:4] == 4'h0 || OPCODE[7:4] == 4'h1) && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign ram_out = (fetch_step == 2'b01 || (OPCODE[7:4] == 4'h0 && op_step == 2'b01)) ? 1'b1 : 1'b0;
 assign ir_in = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
 assign pc_count = (fetch_step == 2'b01) ? 1'b1 : 1'b0;
