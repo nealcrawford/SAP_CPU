@@ -6,7 +6,7 @@ all: ip
 
 ip: component.xml
 
-component.xml: $(cpu_targets)
+component.xml: $(cpu_targets) tcl/metadata.tcl
 	vivado -mode batch -source tcl/$(SCRIPT).tcl
 	rm -rf ip_* vivado*.* xgui/ .Xil* *.*~ webtalk*
 

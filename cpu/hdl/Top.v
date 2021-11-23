@@ -44,7 +44,7 @@ wire out_in;
 
 // ALU
 wire alu_en;
-wire [6:0] alu_sel;
+wire [7:0] alu_sel;
 wire [3:0] condition_bus;
 
 

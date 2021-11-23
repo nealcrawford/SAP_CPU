@@ -43,7 +43,7 @@ output r2_in, r2_mov, r2_out;
 output r3_in, r3_mov, r3_out;
 output out_in;
 output alu_en;
-output [6:0] alu_sel;
+output [7:0] alu_sel;
 output branch;
 
 reg [1:0] fetch_step;
@@ -186,8 +186,7 @@ assign r2_mov = (OPCODE == 8'h22 && op_step == 2'b00) ? 1'b1 : 1'b0;
 assign r3_mov = (OPCODE == 8'h23 && op_step == 2'b00) ? 1'b1 : 1'b0;
 
 assign alu_en = (OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9 && op_step == 2'b00) ? 1'b1 : 1'b0;
-assign alu_sel[6:4] = (OPCODE[7:4] == 4'h4) ? 3'b000 : (OPCODE[7:4] == 4'h5) ? 3'b001 : (OPCODE[7:4] == 4'h6) ? 3'b010 : (OPCODE[7:4] == 4'h7) ? 3'b011 : (OPCODE[7:4] == 4'h8) ? 3'b100 : (OPCODE[7:4] == 4'h9) ? 3'b101 : 3'b000;
-assign alu_sel[3:0] = (OPCODE[7:4] >= 4'h4 && OPCODE[7:4] <= 4'h9) ? OPCODE[3:0] : 4'h0;
+assign alu_sel = OPCODE;
 
 assign branch = (OPCODE[7:4] == 4'hE && op_step == 2'b00) && 
                                  ((OPCODE[3:0] == 4'h0) || // B
